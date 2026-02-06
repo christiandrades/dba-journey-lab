@@ -1,0 +1,29 @@
+services:
+  # O nosso serviço de Banco de Dados
+  postgres-db:
+    image: postgres:16 # Usaremos a versão 16, estável e moderna
+    container_name: dba-lab-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: dba_admin      # Nosso usuário "root" do banco
+      POSTGRES_PASSWORD: dba_password_secure # Senha (em prod, usaríamos secrets!)
+      POSTGRES_DB: learning_db      # Um banco inicial para testes
+    ports:
+      - "5432:5432" # Mapeia a porta 5432 do seu Mac para a 5432 do Container
+    volumes:
+      # AQUI ESTÁ O PULO DO GATO PARA UM DBA:
+      # Estamos mapeando uma pasta local do seu Mac para onde o Postgres guarda dados.
+      # Assim, se deletarmos o container, os dados NÃO somem.
+      - ./pg_data:/var/lib/postgresql/data
+
+  # Ferramenta visual leve para não dependermos só de terminal agora
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: dba-lab-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@dba.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres-db
